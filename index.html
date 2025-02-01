@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SalluG Omni</title>
+    <style>
+        /* Styles for the page */
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: linear-gradient(120deg, #3b82f6, #60a5fa);
+            animation: bgMove 5s infinite alternate;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+
+        @keyframes bgMove {
+            0% { background-position: 0 0; }
+            100% { background-position: 100% 100%; }
+        }
+
+        .welcome-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 3rem;
+            text-shadow: 0 0 20px #ffffff, 0 0 30px #00c3ff;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { text-shadow: 0 0 20px #ffffff, 0 0 30px #00c3ff; }
+            100% { text-shadow: 0 0 30px #00c3ff, 0 0 50px #ffffff; }
+        }
+
+        p {
+            margin: 10px 0;
+            font-size: 1.2rem;
+        }
+
+        .start-btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 1.5rem;
+            background: #007aff;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .start-btn:hover {
+            background: #005ecb;
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="welcome-container">
+        <h1>Welcome to SalluG Omni</h1>
+        <p>Created by M Salman Naseer Rumi</p>
+        <button class="start-btn" onclick="navigateToChat()">Start</button>
+    </div>
+
+    <script>
+        function navigateToChat() {
+            window.location.href = "chat.html";  // Direct to chat page
+        }
+    </script>
+</body>
+</html>
+document.querySelector(".send-btn").addEventListener("click", async function() {
+  const input = document.querySelector(".input");
+  const message = input.value.trim();
+  const chatArea = document.querySelector(".chat-area");
+
+  if (message) {
+    // User ka message
+    const userBubble = document.createElement("div");
+    userBubble.className = "chat-bubble user";
+    userBubble.textContent = message;
+    chatArea.appendChild(userBubble);
+
+    // Input clear karein
+    input.value = "";
+
+    let botResponse = "I'm still learning to respond!";
+
+    // Specific user query ka check karein (news related)
+    if (message.toLowerCase().includes("news") || message.toLowerCase().includes("latest news")) {
+      try {
+        // News API se request bhejein
+        const response = await fetch("http://localhost:3000/news"); // Backend route jo news fetch karega
+        if (!response.ok) throw new Error("Failed to fetch news");
+
+        const data = await response.json();
+        const articles = data.articles || [];
+
+        if (articles.length > 0) {
+          // First article ko response mein include karein
+          botResponse = `Latest news: ${articles[0].title} - ${articles[0].description}`;
+        } else {
+          botResponse = "Sorry, no news found at the moment.";
+        }
+      } catch (error) {
+        botResponse = "I'm having trouble fetching the news. Please try again later!";
+        console.error("API Error:", error);
+      }
+    } else {
+      // Default bot response for other messages
+      botResponse = "I'm still learning to respond!";
+    }
+
+    // Bot ka response display karein
+    const botBubble = document.createElement("div");
+    botBubble.className = "chat-bubble bot";
+    botBubble.textContent = botResponse;
+    chatArea.appendChild(botBubble);
+  }
+});
